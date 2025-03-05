@@ -18,3 +18,5 @@ The simulation uses a two-state Continuous-Time Markov Chain (CTMC) for surge dy
 - Optimizes additive surge to hit target earnings (`R_1 = 2/3`, `R_2 = 1`) and ensure IC.
 - Visualizes pricing functions to compare payout structures 
 
+## Paper
+https://arxiv.org/pdf/1905.07544
