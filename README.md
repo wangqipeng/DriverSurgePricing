@@ -8,6 +8,7 @@ Surge pricing balances supply and demand in ride-hailing platforms. This impleme
 1. **Multiplicative Surge**: Fares scale with trip length (e.g., `w(tau) = m * tau`), used historically by Uber 
 2. **Additive Surge**: Adds a flat bonus to base fares (e.g., `w(tau) = m * tau + a`), Uber’s updated approach 
 3. **Incentive-Compatible (IC) Surge**: Approximates the theoretical form `w_i(tau) = m_i * tau + z_i * q_i_to_j(tau)` , ensuring drivers maximize earnings by accepting all trips.
+In dynamic markets, the surge state (where drivers earn more) can be short-lived. If a driver accepts a ride that is too short, they might miss out on a prolonged surge period. The function uses a term (like q_i_to_j(tau)) to measure the probability that the surge state will end during the trip, thereby quantifying the risk of lost future earnings. This probability is then multiplied by a coefficient (z_i) to convert it into a monetary adjustment.
 
 The simulation uses a two-state Continuous-Time Markov Chain (CTMC) for surge dynamics and a Poisson process for trip arrivals, reflecting the paper’s stochastic model 
 
