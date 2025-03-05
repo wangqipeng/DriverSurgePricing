@@ -1,5 +1,4 @@
-# UberSurgePricing
-# Uber Surge Pricing Reproduction
+# Uber Surge Pricing
 
 This project reproduces Uber's surge pricing mechanisms—multiplicative, additive, and incentive-compatible (IC). It simulates a dynamic ride-hailing environment with surge and non-surge states, computes driver earnings, and optimizes pricing to ensure drivers accept all trips (IC), aligning with Uber's evolution from multiplicative to additive surge pricing.
 
