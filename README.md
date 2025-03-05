@@ -13,8 +13,8 @@ The simulation uses a two-state Continuous-Time Markov Chain (CTMC) for surge dy
 
 ## Features
 - Simulates surge (state 2) and non-surge (state 1) periods with transition rates `lambda_1_to_2 = 1`, `lambda_2_to_1 = 4`.
-- Models trip lengths with a Weibull distribution (shape=2, mean=1/3), per Section 4.2.
-- Computes driver earnings `R(w, sigma) = mu_1 * R_1 + mu_2 * R_2` (Lemma 1).
+- Models trip lengths with a Weibull distribution (shape=2, mean=1/3)
+- Computes driver earnings `R(w, sigma) = mu_1 * R_1 + mu_2 * R_2`
 - Optimizes additive surge to hit target earnings (`R_1 = 2/3`, `R_2 = 1`) and ensure IC.
-- Visualizes pricing functions to compare payout structures (Figure 2a-inspired).
+- Visualizes pricing functions to compare payout structures 
 
