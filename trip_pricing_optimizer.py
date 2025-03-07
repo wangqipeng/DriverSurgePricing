@@ -4,4 +4,19 @@ from scipy.optimize import minimize_scalar
 
 
 class TripPricingOptimizer:
-    pass
+    def __init__(self,
+                 lambda_1=12,
+                 lambda_2=12,
+                 lambda_1_to_2=1,
+                 lambda_2_to_1=4,
+                 trip_mean=1/3,
+                 R_1_target=2/3,
+                 R_2_target=1):
+        self.lambda_1 = lambda_1          # Non-surge trip arrival rate
+        self.lambda_2 = lambda_2          # Surge trip arrival rate
+        self.lambda_1_to_2 = lambda_1_to_2  # Transition rate from non-surge to surge
+        self.lambda_2_to_1 = lambda_2_to_1  # Transition rate from surge to non-surge
+        self.trip_mean = trip_mean        # Mean trip length (Weibull mean)
+        self.R_1_target = R_1_target      # Target earnings rate in non-surge
+        self.R_2_target = R_2_target      # Target earnings rate in surge
+        self.weibull_shape = 2           
