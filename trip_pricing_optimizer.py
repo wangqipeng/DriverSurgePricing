@@ -19,4 +19,17 @@ class TripPricingOptimizer:
         self.trip_mean = trip_mean        # Mean trip length (Weibull mean)
         self.R_1_target = R_1_target      # Target earnings rate in non-surge
         self.R_2_target = R_2_target      # Target earnings rate in surge
-        self.weibull_shape = 2           
+        self.weibull_shape = 2      
+
+    def trip_length_dist(self, size):
+        """
+        Generate trip lengths using a Weibull distribution.
+        Scale is adjusted so that the mean equals self.trip_mean.
+        """
+        scale = self.trip_mean / np.sqrt(np.pi / 2)
+        return weibull_min.rvs(self.weibull_shape, scale=scale, size=size)
+
+    @staticmethod
+    def multiplicative_price(tau, m):
+        return m * tau
+     
