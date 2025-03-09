@@ -32,4 +32,7 @@ class TripPricingOptimizer:
     @staticmethod
     def multiplicative_price(tau, m):
         return m * tau
+
+    def test(self):
+        pass
      
