@@ -36,4 +36,13 @@ class TripPricingOptimizer:
     @staticmethod
     def additive_price(tau, m, a):
         return m * tau + a
+
+    def ic_price(self, tau, m, z, lambda_i_to_j, lambda_j_to_i):
+        return m * tau + z * self.q_i_to_j(tau, lambda_i_to_j, lambda_j_to_i)
+
+    @staticmethod
+    def q_i_to_j(tau, lambda_i_to_j, lambda_j_to_i):
+        alpha = lambda_i_to_j / (lambda_i_to_j + lambda_j_to_i)
+        beta = lambda_i_to_j + lambda_j_to_i
+        return alpha * (1 - np.exp(-beta * tau))
      
