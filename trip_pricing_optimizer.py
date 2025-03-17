@@ -45,4 +45,39 @@ class TripPricingOptimizer:
         alpha = lambda_i_to_j / (lambda_i_to_j + lambda_j_to_i)
         beta = lambda_i_to_j + lambda_j_to_i
         return alpha * (1 - np.exp(-beta * tau))
-     
+
+    def compute_earnings_components(self, sigma, w_func, lambda_i, trip_lengths):
+        in_sigma = (trip_lengths >= sigma[0]) & (trip_lengths <= sigma[1])
+        F_sigma = np.mean(in_sigma)
+        if F_sigma == 0:
+            return 0, float('inf'), 0
+        W = np.mean([w_func(tau) for tau in trip_lengths[in_sigma]])
+        T = 1 / (lambda_i * F_sigma) + np.mean(trip_lengths[in_sigma])
+        R = W / T
+        return W, T, R
+
+    def compute_mu(self, sigma_1, sigma_2, trip_lengths):
+        W_1, T_1, R_1 = self.compute_earnings_components(
+            sigma_1,
+            lambda tau: self.multiplicative_price(tau, self.R_1_target),
+            self.lambda_1,
+            trip_lengths
+        )
+        W_2, T_2, R_2 = self.compute_earnings_components(
+            sigma_2,
+            lambda tau: self.additive_price(tau, self.R_2_target, 0),
+            self.lambda_2,
+            trip_lengths
+        )
+        Q_1 = self.lambda_1_to_2 + self.lambda_1 * np.mean(
+            [self.q_i_to_j(tau, self.lambda_1_to_2, self.lambda_2_to_1) for tau in trip_lengths]
+        )
+        Q_2 = self.lambda_2_to_1 + self.lambda_2 * np.mean(
+            [self.q_i_to_j(tau, self.lambda_2_to_1, self.lambda_1_to_2) for tau in trip_lengths]
+        )
+        T_1_full = self.lambda_1 * np.mean((trip_lengths >= sigma_1[0]) & (trip_lengths <= sigma_1[1])) * T_1
+        T_2_full = self.lambda_2 * np.mean((trip_lengths >= sigma_2[0]) & (trip_lengths <= sigma_2[1])) * T_2
+        denom = T_1_full * Q_2 + T_2_full * Q_1
+        mu_1 = (T_1_full * Q_2) / denom
+        mu_2 = (T_2_full * Q_1) / denom
+        return mu_1, mu_2, R_1, R_2     
