@@ -80,4 +80,53 @@ class TripPricingOptimizer:
         denom = T_1_full * Q_2 + T_2_full * Q_1
         mu_1 = (T_1_full * Q_2) / denom
         mu_2 = (T_2_full * Q_1) / denom
-        return mu_1, mu_2, R_1, R_2     
+        return mu_1, mu_2, R_1, R_2    
+
+ def total_earnings_rate(self, sigma_1, sigma_2, m_1, a_1, m_2, a_2, trip_lengths):
+        w_1 = lambda tau: self.additive_price(tau, m_1, a_1)
+        w_2 = lambda tau: self.additive_price(tau, m_2, a_2)
+        mu_1, mu_2, _, _ = self.compute_mu(sigma_1, sigma_2, trip_lengths)
+        _, _, R_1 = self.compute_earnings_components(sigma_1, w_1, self.lambda_1, trip_lengths)
+        _, _, R_2 = self.compute_earnings_components(sigma_2, w_2, self.lambda_2, trip_lengths)
+        return mu_1 * R_1 + mu_2 * R_2
+
+    def optimize_additive_surge(self, trip_lengths, num_samples=10000):
+        sigma_all = (0, float('inf'))  # Accept all trips
+
+        # Non-surge state parameters: multiplicative pricing only
+        m_1 = self.R_1_target
+        a_1 = 0
+
+        # Optimize additive component a_2 for surge state
+        def earnings_diff(a_2):
+            w_2 = lambda tau: self.additive_price(tau, self.R_2_target, a_2)
+            _, _, R_2 = self.compute_earnings_components(sigma_all, w_2, self.lambda_2, trip_lengths)
+            return (R_2 - self.R_2_target) ** 2
+
+        result = minimize_scalar(earnings_diff, bounds=(0, 5), method='bounded')
+        a_2 = result.x
+        m_2 = self.R_2_target
+
+        # Check incentive compatibility (IC) with different trip strategies
+        strategies = {
+            "All": sigma_all,
+            "Short": (0, self.trip_mean),
+            "Long": (self.trip_mean, float('inf'))
+        }
+
+        print("Non-surge (State 1): m_1 =", m_1, "a_1 =", a_1)
+        w_1 = lambda tau: self.additive_price(tau, m_1, a_1)
+        for name, sigma in strategies.items():
+            _, _, R = self.compute_earnings_components(sigma, w_1, self.lambda_1, trip_lengths)
+            print(f"Strategy {name}: R_1 = {R:.3f}")
+
+        print("\nSurge (State 2): m_2 =", m_2, "a_2 =", a_2)
+        w_2 = lambda tau: self.additive_price(tau, m_2, a_2)
+        for name, sigma in strategies.items():
+            _, _, R = self.compute_earnings_components(sigma, w_2, self.lambda_2, trip_lengths)
+            print(f"Strategy {name}: R_2 = {R:.3f}")
+
+        R_all = self.total_earnings_rate(sigma_all, sigma_all, m_1, a_1, m_2, a_2, trip_lengths)
+        print(f"\nTotal Earnings Rate (accept all): {R_all:.3f}")
+
+        return m_1, a_1, m_2, a_2
